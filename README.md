@@ -1,36 +1,19 @@
 # gulp-inline-ng2-template
+This is a fork of [gulp-inline-ng2-template](https://github.com/ludohenin/gulp-inline-ng2-template).
 
-Inline Angular2 HTML and CSS files into JavaScript ES5/ES6 and TypeScript files (and possibly more - not tested).
+__note:__
 
-[![Build Status](https://travis-ci.org/ludohenin/gulp-inline-ng2-template.svg?branch=master)](https://travis-ci.org/ludohenin/gulp-inline-ng2-template)
-[![npm](https://img.shields.io/npm/dm/gulp-inline-ng2-template.svg?maxAge=2592000)](https://www.npmjs.com/package/gulp-inline-ng2-template)
+* 4.0.1 -
+  * fixed for partial process
+  * added original url to processors - if you want to use a bundler and to leave the files processing to that bundler, replace the text with require
+  * grave accent for style is optional - useStyleGraveAccent option, default useStyleGraveAccent = true
+
+
+Inline Angular HTML and CSS files into JavaScript ES5/ES6 and TypeScript files (and possibly more - not tested).
 
 This plugin uses the [ES6 template strings](https://github.com/lukehoban/es6features#template-strings) syntax by default _(which requires the use of a transpiler -typescript, babel, traceur- to produce valid ES5 files)_ but you can opt-in for ES5 one.
 
 Very convenient to unit test your component or bundle your components/application (avoid extra HTTP request and keeps your source clean).
-
-__note:__
-
-* 4.0.0 -
-  * Now escapes templates (html & css) backslashes. You may remove your custom workarounds if any
-  * Proper error handling and propagation
-* 3.0.0 - __Breaking changes__
-  * Change processor function signature
-* 2.0.0 - __Breaking changes__
-  * Refactor the parser and make it async
-  * `templateProcessor` and `styleProcessor` now accept a callback as 3rd argument
-  * If you're not using the processor functions, everything will work as in 1.x.
-* 1.1.5 adds `customFilePath` option
-* 1.1.4 adds `supportNonExistentFiles` option
-* 1.1.0 adds templateFunction when templateUrl is a function
-* 1.0.0 - __Breaking changes__
-  * Add suppport for processors (templates & styles)
-  * Refactor configuration object (`html` and `css` prop dropped)
-  * Drop jade dependency and related config
-* 0.0.11 adds option to remove line breaks
-* 0.0.10 adds components relative asset paths support (see Configuration)
-* 0.0.8 adds Jade support (add `jade: true` to your config) => __dropped in 1.0.0__
-* 0.0.6 adds support to style sheets
 
 ## TOC
 
@@ -69,8 +52,8 @@ defaults = {
   removeLineBreaks: false     // Content will be included as one line
   templateExtension: '.html', // Update according to your file extension
   templateFunction: false,    // If using a function instead of a string for `templateUrl`, pass a reference to that function here
-  templateProcessor: function (path, ext, file, callback) {/* ... */},
-  styleProcessor: function (path, ext, file, callback) {/* ... */},
+  templateProcessor: function (path, ext, file, url, callback) {/* ... */},
+  styleProcessor: function (path, ext, file, url, callback) {/* ... */},
   customFilePath: function(ext, file) {/* ... */},
   supportNonExistentFiles: false // If html or css file do not exist just return empty content
 };
@@ -88,7 +71,7 @@ defaults = {
  * @Param{Function} callback function (err, result) => void
  * @Return{void}
  */
-function processor(path, ext, file, cb) {
+function processor(path, ext, file, url, cb) {
   // async implementation of your source files processing goes here ...
   cb(null, file);
 }
@@ -107,7 +90,7 @@ const pluginOptions = {
   templateProcessor: minifyTemplate
 };
 
-function minifyTemplate(path, ext, file, cb) {
+function minifyTemplate(path, ext, file, url, cb) {
   try {
     var minifiedFile = htmlMinifier.minify(file, {
       collapseWhitespace: true,
@@ -249,15 +232,6 @@ import {Component, View} from 'angular2/angular2';
   directives: [CORE_DIRECTIVES]
 })
 class AppCmp {}
-```
-
-## Contribute
-
-```bash
-git clone https://github.com/ludohenin/gulp-inline-ng2-template
-cd gulp-inline-ng2-template
-npm install
-npm run test-dev
 ```
 
 ## Contributors
